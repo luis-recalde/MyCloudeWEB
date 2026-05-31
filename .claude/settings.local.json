@@ -3,7 +3,16 @@
     "allow": [
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\luisr\\\\luis\\\\MyCloudeWEB\\\\luis-recalde\\\\app\")",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\luisr\\\\luis\\\\MyCloudeWEB\\\\luis-recalde\\\\components\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\luisr\\\\luis\\\\MyCloudeWEB\\\\luis-recalde\\\\lib\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\luisr\\\\luis\\\\MyCloudeWEB\\\\luis-recalde\\\\public\")",
+      "Bash(Write-Output \"OK\")",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\luisr\\\\luis\\\\MyCloudeWEB\\\\luis-recalde\"; Start-Process powershell -ArgumentList \"-NoExit\", \"-Command\", \"npm run dev\" -WindowStyle Normal; Start-Sleep 3; Write-Output \"Dev server iniciado\")",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\luisr\\\\luis\\\\MyCloudeWEB\\\\luis-recalde\"; Start-Process powershell -ArgumentList \"-NoExit\", \"-Command\", \"npm run dev\" -WindowStyle Normal; Start-Sleep 3; Write-Output \"Dev server reiniciado\")"
     ]
   }
 }
