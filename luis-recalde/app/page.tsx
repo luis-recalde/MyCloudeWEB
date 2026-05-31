@@ -4,6 +4,8 @@ import { About } from '@/components/About'
 import { Services } from '@/components/Services'
 import { CaseStudies } from '@/components/CaseStudies'
 import { Pricing } from '@/components/Pricing'
+import { PaymentOptions } from '@/components/PaymentOptions'
+import { CalendarSection } from '@/components/CalendarSection'
 import { Contact } from '@/components/Contact'
 import { Footer } from '@/components/Footer'
 import { WhatsAppFloat } from '@/components/WhatsAppFloat'
@@ -18,6 +20,8 @@ export default function HomePage() {
         <Services />
         <CaseStudies />
         <Pricing />
+        <PaymentOptions />
+        <CalendarSection />
         <Contact />
       </main>
       <Footer />
