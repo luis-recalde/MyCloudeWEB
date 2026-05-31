@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Integrar pagos en el sitio generado. Cubre tres opciones ordenadas por facilidad de implementación: Lemon Squeezy para productos digitales, Mercado Pago para negocios en LATAM, y Stripe para negocios establecidos que necesitan control total. Para cada opción: cuándo recomendarla, cómo obtener credenciales, y el componente de botón listo para Next.js + Tailwind.
+Integrar pagos en el sitio generado. Cubre cuatro opciones ordenadas por facilidad de implementación: Lemon Squeezy para productos digitales, Mercado Pago para negocios en LATAM, Stripe para negocios establecidos que necesitan control total, y PayPal para audiencias internacionales o clientes sin tarjeta local. Para cada opción: cuándo recomendarla, cómo obtener credenciales, y el componente de botón listo para Next.js + Tailwind.
 
 ---
 
@@ -26,6 +26,9 @@ Integrar pagos en el sitio generado. Cubre tres opciones ordenadas por facilidad
 
 ¿Necesita pagos recurrentes, marketplace, o control total del checkout?
   └─ Sí → Stripe
+
+¿Vende a audiencia internacional o en países donde Mercado Pago no opera?
+  └─ Sí → PayPal (reconocimiento global, acepta tarjetas sin cuenta PayPal)
 ```
 
 ---
@@ -402,6 +405,260 @@ NEXT_PUBLIC_SITE_URL=https://tusitio.com
 
 ---
 
+## OPCIÓN 4 — PayPal
+
+### Cuándo recomendarla
+
+- El negocio vende a clientes internacionales fuera de LATAM (EE.UU., Europa, Asia)
+- El cliente objetivo puede no tener tarjeta de crédito local pero sí cuenta PayPal
+- El negocio opera en países donde Mercado Pago no está disponible (Venezuela, Bolivia, Honduras, Guatemala, Nicaragua, Costa Rica, Panamá)
+- Se quiere ofrecer una segunda opción de pago junto a Stripe o Lemon Squeezy para aumentar la tasa de conversión
+- El producto se vende en USD y la audiencia confía más en PayPal que en procesadores locales
+
+### Obtener el Client ID
+
+1. Crear cuenta en **https://developer.paypal.com** (usar la cuenta de PayPal existente o crear una)
+2. Ir a "My Apps & Credentials"
+3. En "REST API apps" → "Create App"
+4. Nombre de la app: nombre del negocio → Create App
+5. Copiar el **Client ID** (para el frontend) y el **Secret** (para el backend)
+6. Para pruebas: usar las credenciales del modo "Sandbox" — PayPal provee cuentas de comprador y vendedor de prueba
+
+### Integración con `@paypal/react-paypal-js`
+
+```bash
+npm install @paypal/react-paypal-js
+```
+
+**Provider global** — agregar en `app/layout.tsx`:
+
+```tsx
+// app/layout.tsx
+import { PayPalScriptProvider } from '@paypal/react-paypal-js'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="es">
+      <body>
+        <PayPalScriptProvider
+          options={{
+            clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+            currency: 'USD',
+            intent: 'capture',
+          }}
+        >
+          {children}
+        </PayPalScriptProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+**Componente PayPalButton:**
+
+```tsx
+// components/PayPalButton.tsx
+'use client'
+
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
+
+interface PayPalButtonProps {
+  amount: string        // monto en USD como string, ej: "97.00"
+  description: string   // descripción del producto
+  onSuccess?: (orderId: string) => void
+  onError?: (error: unknown) => void
+}
+
+export function PayPalButton({
+  amount,
+  description,
+  onSuccess,
+  onError,
+}: PayPalButtonProps) {
+  const [{ isPending }] = usePayPalScriptReducer()
+
+  if (isPending) {
+    return (
+      <div className="w-full h-12 bg-foreground/5 rounded animate-pulse" aria-label="Cargando opciones de pago..." />
+    )
+  }
+
+  return (
+    <PayPalButtons
+      style={{
+        layout: 'vertical',
+        color: 'gold',
+        shape: 'rect',
+        label: 'pay',
+        height: 48,
+      }}
+      createOrder={async () => {
+        const res = await fetch('/api/paypal-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, description }),
+        })
+        const { id } = await res.json()
+        return id
+      }}
+      onApprove={async (data) => {
+        const res = await fetch('/api/paypal-capture', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: data.orderID }),
+        })
+        const capture = await res.json()
+        if (capture.status === 'COMPLETED') {
+          onSuccess?.(data.orderID)
+        }
+      }}
+      onError={(err) => {
+        console.error('PayPal error:', err)
+        onError?.(err)
+      }}
+    />
+  )
+}
+```
+
+**API routes del servidor:**
+
+```ts
+// app/api/paypal-order/route.ts — crear orden
+export async function POST(req: Request) {
+  const { amount, description } = await req.json()
+
+  const auth = Buffer.from(
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
+  ).toString('base64')
+
+  // Obtener access token
+  const tokenRes = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  })
+  const { access_token } = await tokenRes.json()
+
+  // Crear orden
+  const orderRes = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          description,
+          amount: { currency_code: 'USD', value: amount },
+        },
+      ],
+    }),
+  })
+  const order = await orderRes.json()
+
+  return Response.json({ id: order.id })
+}
+```
+
+```ts
+// app/api/paypal-capture/route.ts — capturar el pago aprobado
+export async function POST(req: Request) {
+  const { orderId } = await req.json()
+
+  const auth = Buffer.from(
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
+  ).toString('base64')
+
+  const tokenRes = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  })
+  const { access_token } = await tokenRes.json()
+
+  const captureRes = await fetch(
+    `https://api-m.paypal.com/v2/checkout/orders/${orderId}/capture`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+  const capture = await captureRes.json()
+
+  return Response.json(capture)
+}
+```
+
+Variables de entorno en `.env.local`:
+```
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=tu_client_id_paypal
+PAYPAL_CLIENT_ID=tu_client_id_paypal
+PAYPAL_SECRET=tu_secret_paypal
+# Para sandbox (pruebas): usar las credenciales del modo Sandbox
+# Para producción: cambiar https://api-m.paypal.com por https://api-m.paypal.com (ya es producción)
+# Para sandbox: usar https://api-m.sandbox.paypal.com
+```
+
+### Uso en el sitio
+
+```tsx
+// En una página de producto o en la sección de precios
+import { PayPalButton } from '@/components/PayPalButton'
+
+<div className="max-w-sm mx-auto">
+  <PayPalButton
+    amount="97.00"
+    description="Curso de diseño web sin programar"
+    onSuccess={(orderId) => {
+      // Redirigir a página de gracias o activar acceso al producto
+      window.location.href = `/gracias?order=${orderId}`
+    }}
+    onError={() => {
+      alert('Hubo un error con el pago. Intentá de nuevo o contactanos.')
+    }}
+  />
+</div>
+```
+
+### PayPal + otra opción en paralelo
+
+Para maximizar conversión, ofrecer PayPal como segunda opción junto al método principal:
+
+```tsx
+<div className="space-y-4 max-w-sm mx-auto">
+  {/* Opción principal */}
+  <LemonButton
+    checkoutUrl="https://..."
+    label="Pagar con tarjeta — $97 USD"
+    variant="primary"
+  />
+
+  <div className="flex items-center gap-3 text-foreground/30 text-xs">
+    <div className="h-px flex-1 bg-foreground/10" />
+    o pagá con
+    <div className="h-px flex-1 bg-foreground/10" />
+  </div>
+
+  {/* PayPal como alternativa */}
+  <PayPalButton amount="97.00" description="Curso de diseño web" />
+</div>
+```
+
+---
+
 ## Sección de precios en el sitio
 
 Independientemente del procesador elegido, la sección de precios sigue este patrón:
@@ -482,7 +739,7 @@ Cuando el usuario responde afirmativamente a la pregunta de pagos en Ronda 4, ha
 
 1. "¿Qué vas a vender? (producto digital, servicio, curso, suscripción mensual)"
 2. "¿Desde qué país operás y en qué moneda querés cobrar?"
-3. "¿Ya tenés cuenta en Mercado Pago, Stripe o Lemon Squeezy?"
+3. "¿Ya tenés cuenta en Mercado Pago, Stripe, Lemon Squeezy o PayPal Business?"
 
 Con esas respuestas, aplicar la decisión:
 
@@ -494,6 +751,8 @@ Con esas respuestas, aplicar la decisión:
 | Opera en EE.UU., Europa, o necesita suscripciones | Stripe |
 | No sabe qué quiere y está en LATAM | Mercado Pago como default |
 | No sabe y está fuera de LATAM | Lemon Squeezy como default |
+| Audiencia internacional o países sin Mercado Pago | PayPal (solo o como segunda opción) |
+| Quiere maximizar conversión en checkout | PayPal + opción principal en paralelo |
 
 Confirmar antes del build:
 > "Voy a integrar [procesador] para que puedas cobrar [producto] directamente desde el sitio. El visitante hace clic en el botón y es llevado al checkout de [procesador] para completar el pago. ¿Confirmamos?"
