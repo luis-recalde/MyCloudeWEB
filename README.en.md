@@ -12,7 +12,7 @@ Answer a few questions about your business. The AI writes the code, designs the 
 
 ## What You Get
 
-- A complete **Next.js 14** website with your real content and branding
+- A complete **Next.js 15** website with your real content and branding
 - **Tailwind CSS** design system tuned to your industry and style
 - Full **mobile responsiveness** out of the box
 - **SEO metadata** configured with your business information
@@ -160,6 +160,9 @@ Absolutely. The generated code is standard Next.js + Tailwind. Any developer can
 
 **What if I want changes after the site is built?**
 Open Claude Code in the generated project folder and describe what you want in plain language.
+
+**Is the generated code secure?**
+Yes. MyCloudeWEB runs an automated security audit before every deploy — score 95/100. No critical or high vulnerabilities.
 
 ---
 

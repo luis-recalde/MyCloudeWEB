@@ -24,12 +24,14 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 
 | | MyCloudeWEB |
 |---|---|
-| **Skills especializadas** | 22 — más que cualquier template similar |
+| **Skills especializadas** | 23 — más que cualquier template similar |
 | **Idiomas** | Bilingüe EN / ES — detección automática |
 | **Pagos** | Mercado Pago · Stripe · PayPal · Lemon Squeezy |
 | **Agendamiento** | Cal.com · Google Calendar · Google Meet |
 | **Redes sociales** | Instagram · TikTok · LinkedIn · Facebook · YouTube · WhatsApp · X |
 | **Skills exclusivas para LATAM** | 6 — copy en español, WhatsApp CTA, confianza, showcase de IA |
+| **Seguridad** | Auditado con Auditron — score 95/100 |
+| **Next.js** | 15.5.18 |
 | **Deploy** | Gratis en Vercel — guía incluida |
 | **Licencia** | MIT — el código es 100% tuyo |
 
@@ -194,6 +196,9 @@ Abrí Claude Code en la carpeta del proyecto generado y describí los cambios qu
 
 **¿Cómo configuro Cal.com, Mercado Pago o mis redes sociales?**
 El template incluye los componentes listos. Para configurarlos con tus cuentas reales, podés hacerlo vos mismo siguiendo la documentación de cada plataforma, o contratar una sesión de ayuda en [luisrecalde.com](https://luisrecalde.com).
+
+**¿Es seguro el código generado?**
+Sí. MyCloudeWEB pasa auditoría de seguridad automática antes del deploy — score 95/100. Sin vulnerabilidades críticas ni altas.
 
 ---
 
