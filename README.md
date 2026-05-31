@@ -1,8 +1,12 @@
 # MyCloudeWEB
 
-**Build your professional website with AI — no coding required.**
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Stars](https://img.shields.io/github/stars/luis-recalde/MyCloudeWEB?style=social)](https://github.com/luis-recalde/MyCloudeWEB/stargazers)
+[![Forks](https://img.shields.io/github/forks/luis-recalde/MyCloudeWEB?style=social)](https://github.com/luis-recalde/MyCloudeWEB/network/members)
 
-MyCloudeWEB is an open source template that lets anyone build and deploy a complete professional website in one session. You answer questions about your business in plain language. The AI builds the entire site — code, design, copy, and deployment.
+**Your professional website, live today. No code. No agency. No waiting.**
+
+Answer a few questions about your business. The AI writes the code, designs the site, and guides you through deployment — all in one session.
 
 ---
 
@@ -13,6 +17,21 @@ MyCloudeWEB is an open source template that lets anyone build and deploy a compl
 - Full **mobile responsiveness** out of the box
 - **SEO metadata** configured with your business information
 - Step-by-step guidance to deploy for free on **Vercel**
+
+---
+
+## Demo
+
+When you run MyCloudeWEB, here is what happens:
+
+1. Open Claude Code in this folder and say *"I want to build my website."*
+2. The AI asks about your business in four short rounds — identity, style, content, and setup.
+3. It presents a full design system: your colors, fonts, and page layout — for your approval.
+4. You approve. The AI generates all the code. You don't touch anything.
+5. Your site runs locally at `http://localhost:3000` — review it in your browser.
+6. The AI walks you through GitHub and Vercel. Your site is live in minutes.
+
+No terminal commands to figure out. No config files to edit. No design decisions to make alone.
 
 ---
 
@@ -32,7 +51,7 @@ No web development experience needed.
 ### 1. Clone this repository
 
 ```bash
-git clone https://github.com/luisrecalde/MyCloudeWEB.git
+git clone https://github.com/luis-recalde/MyCloudeWEB.git
 cd MyCloudeWEB
 ```
 
@@ -135,7 +154,17 @@ Open Claude Code in the generated project folder and describe what you want in p
 
 ## Contributing
 
-Pull requests are welcome. See open issues for planned improvements.
+Contributions are welcome. Here is how to participate:
+
+**Report a bug or suggest a feature**
+Open an issue on [GitHub Issues](https://github.com/luis-recalde/MyCloudeWEB/issues). Describe what happened, what you expected, and your environment (OS, Node.js version, Claude Code version).
+
+**Submit a pull request**
+1. Fork the repository and create a branch: `git checkout -b fix/your-fix-name`
+2. Keep the PR focused on one change — small and reviewable
+3. Open a pull request with a clear description of what you changed and why
+
+For large changes, open an issue first to discuss the approach before writing code.
 
 ---
 
