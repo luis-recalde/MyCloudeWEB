@@ -41,7 +41,8 @@ export function ContactForm() {
       } else {
         setStatus('error')
       }
-    } catch {
+    } catch (err) {
+      if (process.env.NODE_ENV !== 'production') console.error('[ContactForm] error al enviar:', err)
       setStatus('error')
     }
   }

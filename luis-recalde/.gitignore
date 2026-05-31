@@ -5,6 +5,9 @@
 .DS_Store
 *.pem
 npm-debug.log*
+.env
+.env.production
+.env.staging
 .env*.local
 .vercel
 *.tsbuildinfo
