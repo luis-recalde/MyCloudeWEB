@@ -22,16 +22,27 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 
 ## Demo
 
-Esto es lo que pasa cuando usás MyCloudeWEB:
+### El proceso
 
-1. Abrís Claude Code en esta carpeta y escribís *"Quiero armar mi sitio web."*
-2. La IA te hace preguntas sobre tu negocio en cuatro rondas cortas — identidad, estilo, contenido y configuración.
-3. Te presenta un sistema de diseño completo: tus colores, tipografías y estructura de página — para que lo apruebes.
-4. Lo aprobás. La IA genera todo el código. Vos no hacés nada.
-5. Tu sitio corre localmente en `http://localhost:3000` — lo revisás desde el navegador.
-6. La IA te guía en GitHub y Vercel. Tu sitio queda en línea en minutos.
+![El agente haciendo preguntas sobre tu negocio en lenguaje natural](docs/screenshots/Preguntas.png)
+*La IA te guía en 4 rondas de preguntas — sin conocimiento técnico requerido.*
 
-Sin comandos de terminal que descifrar. Sin archivos de configuración que editar. Sin decisiones de diseño que tomar solo.
+![El agente generando todo el código automáticamente](docs/screenshots/Construyendo.png)
+*Cuando aprobás el diseño, la IA escribe cada archivo. Vos no hacés nada.*
+
+### El resultado — RS Games Club, construido con MyCloudeWEB
+
+![RS Games Club — sección hero](docs/screenshots/hero-rsgames.png)
+*Hero con identidad visual, paleta de colores y CTA personalizados para el negocio.*
+
+![RS Games Club — sección nosotros](docs/screenshots/nosotros-rsgames.png)
+*Sección sobre el negocio generada a partir de las respuestas del cuestionario — sin Lorem ipsum.*
+
+![RS Games Club — sección servicios](docs/screenshots/servicios-rsgames.png)
+*Sección de servicios con contenido real y layout elegido para la industria.*
+
+![RS Games Club — sección contacto](docs/screenshots/contacto-rsgames.png)
+*Sección de contacto con todos los canales provistos por el cliente, incluyendo WhatsApp.*
 
 ---
 

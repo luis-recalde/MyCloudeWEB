@@ -22,16 +22,27 @@ Answer a few questions about your business. The AI writes the code, designs the 
 
 ## Demo
 
-When you run MyCloudeWEB, here is what happens:
+### The process
 
-1. Open Claude Code in this folder and say *"I want to build my website."*
-2. The AI asks about your business in four short rounds — identity, style, content, and setup.
-3. It presents a full design system: your colors, fonts, and page layout — for your approval.
-4. You approve. The AI generates all the code. You don't touch anything.
-5. Your site runs locally at `http://localhost:3000` — review it in your browser.
-6. The AI walks you through GitHub and Vercel. Your site is live in minutes.
+![The agent asking about your business in plain language](docs/screenshots/Preguntas.png)
+*The AI guides you through 4 rounds of questions — no technical knowledge required.*
 
-No terminal commands to figure out. No config files to edit. No design decisions to make alone.
+![The agent generating all the code automatically](docs/screenshots/Construyendo.png)
+*Once you approve the design, the AI writes every file. You don't touch anything.*
+
+### The result — RS Games Club, built with MyCloudeWEB
+
+![RS Games Club — hero section](docs/screenshots/hero-rsgames.png)
+*Hero section with custom branding, color palette, and CTA tailored to the business.*
+
+![RS Games Club — about section](docs/screenshots/nosotros-rsgames.png)
+*About section generated from the questionnaire answers — no Lorem ipsum.*
+
+![RS Games Club — services section](docs/screenshots/servicios-rsgames.png)
+*Services section with real content and layout chosen for the industry.*
+
+![RS Games Club — contact section](docs/screenshots/contacto-rsgames.png)
+*Contact section with every channel the client provided, including WhatsApp.*
 
 ---
 
