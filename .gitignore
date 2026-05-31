@@ -1,0 +1,6 @@
+# Sitios generados por MyCloudeWEB — nunca commitear
+# Cada sitio generado vive en su propia carpeta y su propio repo privado
+*/node_modules/
+*/.next/
+# Agregar aquí el nombre de tu carpeta generada, ejemplo:
+# mi-negocio/

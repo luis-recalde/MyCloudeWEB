@@ -159,6 +159,8 @@ MyCloudeWEB/
 
 Cuando la IA construye tu sitio, crea una nueva carpeta con el nombre de tu negocio dentro de este directorio.
 
+> ⚠️ **El código del cliente es privado.** Los sitios generados se crean en subcarpetas dentro de MyCloudeWEB. Cada sitio debe tener su propio repo privado — nunca subas el código del cliente al repo público de MyCloudeWEB.
+
 ---
 
 ## Industrias cubiertas

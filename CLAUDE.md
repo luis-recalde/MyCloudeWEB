@@ -259,6 +259,8 @@ Repository: https://github.com/[user]/[repo]
 - Share your URL!
 ```
 
+**IMPORTANTE:** El sitio generado NO debe estar en el repo público de MyCloudeWEB. Antes de hacer push, asegurarse de que la carpeta del sitio esté en `.gitignore` y crear un repo **privado** separado para el cliente.
+
 ---
 
 ## General Rules (always apply)

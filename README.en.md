@@ -126,6 +126,8 @@ MyCloudeWEB/
 
 When the AI builds your site, it creates a new folder named after your business inside this directory.
 
+> ⚠️ **Client code is private.** Generated sites are created as subfolders inside MyCloudeWEB. Each site must have its own private repository — never push client code to the public MyCloudeWEB repo.
+
 ---
 
 ## Supported Industries
