@@ -271,4 +271,32 @@ Repository: https://github.com/[user]/[repo]
 
 ---
 
+## Skills disponibles
+
+Las siguientes skills están en `.claude/skills/`. Activarlas cuando el contexto lo indique — no es necesario que el usuario las nombre explícitamente.
+
+| Skill | Descripción | Activar cuando... |
+|---|---|---|
+| `frontend-design` | Metodología de diseño: tipografía, colores, espaciado, layout, motion y anti-AI-slop | El diseño parece genérico, falta sistema visual, o se definen tokens de diseño |
+| `shadcn-ui` | Guía de componentes React + Tailwind accesibles basados en Radix UI | Se agregan componentes de UI como modales, inputs, botones o selects |
+| `humanizer` | Detecta y reemplaza 30+ patrones de escritura IA — calcos, adjetivos inflados, CTAs genéricos | El copy suena traducido, corporativo o "demasiado perfecto" |
+| `vercel-react-best-practices` | 62 reglas de performance para Next.js: imágenes, fuentes, JS, caché, fetching | Se genera o revisa código Next.js, o el Lighthouse score es bajo |
+| `vercel-deploy` | Deploy completo paso a paso: GitHub → Vercel → dominio personalizado | El sitio está listo y el usuario quiere ponerlo en línea |
+| `building-components` | Patrones para Hero, Navbar, Cards, Formularios y Testimonios accesibles en React | Se construyen secciones nuevas del sitio |
+| `web-design-guidelines` | Principios de jerarquía visual, whitespace, contraste y consistencia aplicados en código | El diseño se ve desorganizado, cargado, o sin jerarquía |
+| `playwright-cli` | QA visual automatizado: screenshots en mobile/desktop y verificación de elementos críticos | El sitio está corriendo y se quiere verificar antes del deploy |
+| `chrome-bridge-automation` | QA visual fallback vía Chrome/puppeteer-core cuando Playwright no está disponible | Playwright no está instalado o el entorno no permite instalar browsers adicionales |
+| `seo-audit` | Checklist completo: meta tags, headings, alt text, structured data, sitemap, robots.txt | El sitio se va a publicar o el usuario pregunta sobre Google o posicionamiento |
+| `ui-ux-pro-max` | 161 paletas por industria, 57 combinaciones tipográficas y 50+ estilos de layout | Se elige la dirección visual de un proyecto nuevo o el diseño no tiene personalidad |
+| `web-reader` | Analiza URLs de referencia del usuario: paleta, copy, estructura y decisiones de layout | El usuario comparte un sitio y dice "quiero algo así" o "como este" |
+| `deep-research` | Investigación web sistemática para encontrar el lenguaje real del cliente objetivo | El copy es vago o no refleja cómo habla realmente la audiencia del negocio |
+| `spanish-copy` | Reglas para copy en español latinoamericano: voseo/tuteo, calcos, longitudes, CTAs | Se escribe copy en español para cualquier sección del sitio |
+| `whatsapp-cta` | Optimización de CTAs para WhatsApp: links correctos, mensajes pre-cargados, botón flotante | El negocio opera en LATAM y necesita un canal de contacto directo en el sitio |
+| `ai-showcase` | Cómo presentar proyectos construidos con IA de forma creíble y sin sonar a "vendo humo" | El negocio ofrece servicios de IA o el usuario quiere mostrar proyectos en su portfolio |
+| `trust-builder` | Elementos de confianza para LATAM: testimonios, garantías, credenciales, sobre mí | El sitio no genera consultas o el servicio requiere alta confianza antes de contratar |
+| `performance-audit` | Checklist de velocidad: imágenes, fuentes, scripts, JS, Core Web Vitals, bundle size | El sitio está lento, Lighthouse < 80 en Performance, o se hace QA final pre-deploy |
+| `accessibility-check` | Contraste, semántica HTML, navegación por teclado, ARIA, formularios, lectores de pantalla | Se construye o revisa cualquier componente interactivo, o Lighthouse Accessibility < 90 |
+
+---
+
 *MyCloudeWEB — Copyright: Luis Recalde 2026 — MIT License*
