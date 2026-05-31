@@ -25,23 +25,29 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 ### El proceso
 
 ![El agente haciendo preguntas sobre tu negocio en lenguaje natural](docs/screenshots/Preguntas.png)
+
 *La IA te guía en 4 rondas de preguntas — sin conocimiento técnico requerido.*
 
 ![El agente generando todo el código automáticamente](docs/screenshots/Construyendo.png)
+
 *Cuando aprobás el diseño, la IA escribe cada archivo. Vos no hacés nada.*
 
 ### El resultado — RS Games Club, construido con MyCloudeWEB
 
 ![RS Games Club — sección hero](docs/screenshots/hero-rsgames.png)
+
 *Hero con identidad visual, paleta de colores y CTA personalizados para el negocio.*
 
 ![RS Games Club — sección nosotros](docs/screenshots/nosotros-rsgames.png)
+
 *Sección sobre el negocio generada a partir de las respuestas del cuestionario — sin Lorem ipsum.*
 
 ![RS Games Club — sección servicios](docs/screenshots/servicios-rsgames.png)
+
 *Sección de servicios con contenido real y layout elegido para la industria.*
 
 ![RS Games Club — sección contacto](docs/screenshots/contacto-rsgames.png)
+
 *Sección de contacto con todos los canales provistos por el cliente, incluyendo WhatsApp.*
 
 ---
