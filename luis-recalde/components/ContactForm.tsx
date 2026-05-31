@@ -24,6 +24,10 @@ export function ContactForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!form.name.trim() || form.name.length > 100) return setStatus('error')
+    if (!emailRegex.test(form.email)) return setStatus('error')
+    if (form.message.trim().length < 10 || form.message.length > 2000) return setStatus('error')
     setStatus('sending')
     try {
       const res = await fetch(FORMSPREE_URL, {
