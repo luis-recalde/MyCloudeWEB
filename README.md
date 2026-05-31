@@ -4,183 +4,183 @@
 [![Stars](https://img.shields.io/github/stars/luis-recalde/MyCloudeWEB?style=social)](https://github.com/luis-recalde/MyCloudeWEB/stargazers)
 [![Forks](https://img.shields.io/github/forks/luis-recalde/MyCloudeWEB?style=social)](https://github.com/luis-recalde/MyCloudeWEB/network/members)
 
-**Your professional website, live today. No code. No agency. No waiting.**
+**Tu sitio web profesional, en línea hoy. Sin código. Sin agencia. Sin esperar.**
 
-Answer a few questions about your business. The AI writes the code, designs the site, and guides you through deployment — all in one session.
+Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña el sitio y te guía hasta el deploy — todo en una sola sesión.
 
 ---
 
-## What You Get
+## Qué obtenés
 
-- A complete **Next.js 14** website with your real content and branding
-- **Tailwind CSS** design system tuned to your industry and style
-- Full **mobile responsiveness** out of the box
-- **SEO metadata** configured with your business information
-- Step-by-step guidance to deploy for free on **Vercel**
+- Un sitio web completo en **Next.js 14** con tu contenido real y tu identidad visual
+- Sistema de diseño en **Tailwind CSS** adaptado a tu industria y estilo
+- **Diseño responsivo** para móvil desde el primer momento
+- **Metadatos SEO** configurados con la información de tu negocio
+- Guía paso a paso para desplegarlo gratis en **Vercel**
 
 ---
 
 ## Demo
 
-### The process
+### El proceso
 
-![The agent asking about your business in plain language](docs/screenshots/Preguntas.png)
-*The AI guides you through 4 rounds of questions — no technical knowledge required.*
+![El agente haciendo preguntas sobre tu negocio en lenguaje natural](docs/screenshots/Preguntas.png)
+*La IA te guía en 4 rondas de preguntas — sin conocimiento técnico requerido.*
 
-![The agent generating all the code automatically](docs/screenshots/Construyendo.png)
-*Once you approve the design, the AI writes every file. You don't touch anything.*
+![El agente generando todo el código automáticamente](docs/screenshots/Construyendo.png)
+*Cuando aprobás el diseño, la IA escribe cada archivo. Vos no hacés nada.*
 
-### The result — RS Games Club, built with MyCloudeWEB
+### El resultado — RS Games Club, construido con MyCloudeWEB
 
-![RS Games Club — hero section](docs/screenshots/hero-rsgames.png)
-*Hero section with custom branding, color palette, and CTA tailored to the business.*
+![RS Games Club — sección hero](docs/screenshots/hero-rsgames.png)
+*Hero con identidad visual, paleta de colores y CTA personalizados para el negocio.*
 
-![RS Games Club — about section](docs/screenshots/nosotros-rsgames.png)
-*About section generated from the questionnaire answers — no Lorem ipsum.*
+![RS Games Club — sección nosotros](docs/screenshots/nosotros-rsgames.png)
+*Sección sobre el negocio generada a partir de las respuestas del cuestionario — sin Lorem ipsum.*
 
-![RS Games Club — services section](docs/screenshots/servicios-rsgames.png)
-*Services section with real content and layout chosen for the industry.*
+![RS Games Club — sección servicios](docs/screenshots/servicios-rsgames.png)
+*Sección de servicios con contenido real y layout elegido para la industria.*
 
-![RS Games Club — contact section](docs/screenshots/contacto-rsgames.png)
-*Contact section with every channel the client provided, including WhatsApp.*
-
----
-
-## Prerequisites
-
-You only need two things installed:
-
-- [Node.js 18+](https://nodejs.org) — the JavaScript runtime
-- [Claude Code](https://claude.ai/code) — the AI coding assistant
-
-No web development experience needed.
+![RS Games Club — sección contacto](docs/screenshots/contacto-rsgames.png)
+*Sección de contacto con todos los canales provistos por el cliente, incluyendo WhatsApp.*
 
 ---
 
-## How to Use
+## Requisitos previos
 
-### 1. Clone this repository
+Solo necesitás dos cosas instaladas:
+
+- [Node.js 18+](https://nodejs.org) — el entorno de ejecución de JavaScript
+- [Claude Code](https://claude.ai/code) — el asistente de código con IA
+
+No se requiere experiencia en desarrollo web.
+
+---
+
+## Cómo usarlo
+
+### 1. Cloná este repositorio
 
 ```bash
 git clone https://github.com/luis-recalde/MyCloudeWEB.git
 cd MyCloudeWEB
 ```
 
-### 2. Open Claude Code
+### 2. Abrí Claude Code
 
 ```bash
 claude
 ```
 
-Or open it from your IDE or the Claude desktop app.
+O abrilo desde tu IDE o la app de escritorio de Claude.
 
-### 3. Say hello
+### 3. Saludá
 
-Just type a message in your language — English or Spanish — and the AI takes it from there.
+Solo escribí un mensaje en tu idioma — español o inglés — y la IA se encarga del resto.
 
-Examples:
-- *"Hi, I want to build my website"*
+Ejemplos:
 - *"Hola, quiero armar mi sitio web"*
+- *"Hi, I want to build my website"*
 
-### 4. Answer the questions
+### 4. Respondé las preguntas
 
-The AI asks about your business in 4 short rounds:
-- Your business identity and value proposition
-- Your visual style and brand colors
-- What sections and content you want
-- Technical setup (domain, language, analytics)
+La IA te va a hacer preguntas sobre tu negocio en 4 rondas cortas:
+- Tu identidad de negocio y propuesta de valor
+- Tu estilo visual y colores de marca
+- Qué secciones y contenido querés
+- Configuración técnica (dominio, idioma, analíticas)
 
-No technical knowledge required. Answer in plain language.
+No necesitás conocimiento técnico. Respondé en lenguaje natural.
 
-### 5. Approve your design
+### 5. Aprobá tu sistema de diseño
 
-Before building, the AI presents a complete design system — colors, fonts, and page structure — for your approval. Request changes or approve and proceed.
+Antes de construir, la IA presenta un sistema de diseño completo — colores, tipografías y estructura de página — para que lo apruebes. Pedí cambios o aprobalo para continuar.
 
-### 6. Wait while it builds
+### 6. Esperá mientras construye
 
-The AI generates all the code, installs dependencies, and verifies the build. You don't touch anything.
+La IA genera todo el código, instala las dependencias y verifica que el build funcione. Vos no hacés nada.
 
-### 7. Preview locally
+### 7. Vista previa local
 
-Open `http://localhost:3000` in your browser and review your site.
+Abrí `http://localhost:3000` en tu navegador y revisá tu sitio.
 
-### 8. Deploy to Vercel
+### 8. Deploy en Vercel
 
-The AI walks you through pushing to GitHub and deploying on Vercel's free plan. Your site is live in minutes.
+La IA te guía para subir el código a GitHub y desplegarlo en el plan gratuito de Vercel. Tu sitio queda en línea en minutos.
 
 ---
 
-## Project Structure
+## Estructura del proyecto
 
 ```
 MyCloudeWEB/
-├── CLAUDE.md                   # AI agent instructions (the brain)
+├── CLAUDE.md                   # Instrucciones del agente IA (el cerebro)
 ├── docs/
-│   ├── questionnaire-en.md     # Business questionnaire (English)
-│   ├── questionnaire-es.md     # Business questionnaire (Spanish)
-│   ├── design-guide.md         # Color palettes, typography, layouts
-│   └── deploy-guide.md         # Vercel deployment guide
-├── README.md                   # This file
-└── README.es.md                # Spanish README
+│   ├── questionnaire-es.md     # Cuestionario de negocio (español)
+│   ├── questionnaire-en.md     # Cuestionario de negocio (inglés)
+│   ├── design-guide.md         # Paletas, tipografías y layouts
+│   └── deploy-guide.md         # Guía de deploy en Vercel
+├── README.md                   # Este archivo
+└── README.en.md                # README en inglés
 ```
 
-When the AI builds your site, it creates a new folder named after your business inside this directory.
+Cuando la IA construye tu sitio, crea una nueva carpeta con el nombre de tu negocio dentro de este directorio.
 
 ---
 
-## Supported Industries
+## Industrias cubiertas
 
-The design guide includes tailored palettes, typography, and layouts for:
+La guía de diseño incluye paletas, tipografías y layouts adaptados para:
 
-- Technology & SaaS
-- Health & Wellness
-- Education & Coaching
-- Food & Hospitality
-- Professional Services (law, consulting, finance)
-- Creative Services (design, photography, branding)
-
----
-
-## Languages
-
-The entire experience runs in English or Spanish, detected automatically from your first message.
+- Tecnología y SaaS
+- Salud y bienestar
+- Educación y coaching
+- Gastronomía y hospitalidad
+- Servicios profesionales (derecho, consultoría, finanzas)
+- Servicios creativos (diseño, fotografía, branding)
 
 ---
 
-## FAQ
+## Idiomas
 
-**Do I need to know how to code?**
-No. The AI writes all the code. You only answer questions about your business.
-
-**Is this really free?**
-Yes. Claude Code has a free tier. Vercel's Hobby plan is free and sufficient for a professional site. You only pay if you buy a custom domain.
-
-**Can I edit the code afterward?**
-Absolutely. The generated code is standard Next.js + Tailwind. Any developer can maintain and extend it.
-
-**What if I want changes after the site is built?**
-Open Claude Code in the generated project folder and describe what you want in plain language.
+Toda la experiencia — preguntas, sistema de diseño y guía de deploy — funciona en español o inglés. El idioma se detecta automáticamente desde tu primer mensaje.
 
 ---
 
-## Contributing
+## Preguntas frecuentes
 
-Contributions are welcome. Here is how to participate:
+**¿Necesito saber programar?**
+No. La IA escribe todo el código. Vos solo respondés preguntas sobre tu negocio.
 
-**Report a bug or suggest a feature**
-Open an issue on [GitHub Issues](https://github.com/luis-recalde/MyCloudeWEB/issues). Describe what happened, what you expected, and your environment (OS, Node.js version, Claude Code version).
+**¿Es realmente gratis?**
+Sí. Claude Code tiene un plan gratuito. El plan Hobby de Vercel también es gratuito y más que suficiente para un sitio profesional. Solo pagás si comprás un dominio propio.
 
-**Submit a pull request**
-1. Fork the repository and create a branch: `git checkout -b fix/your-fix-name`
-2. Keep the PR focused on one change — small and reviewable
-3. Open a pull request with a clear description of what you changed and why
+**¿Puedo editar el código después?**
+Sí. El código generado es Next.js + Tailwind estándar. Cualquier desarrollador puede mantenerlo y extenderlo.
 
-For large changes, open an issue first to discuss the approach before writing code.
+**¿Qué pasa si quiero cambios después de que el sitio esté construido?**
+Abrí Claude Code en la carpeta del proyecto generado y describí los cambios que querés en lenguaje natural.
 
 ---
 
-## License
+## Contribuciones
+
+Las contribuciones son bienvenidas. Así podés participar:
+
+**Reportar un bug o sugerir una mejora**
+Abrí un issue en [GitHub Issues](https://github.com/luis-recalde/MyCloudeWEB/issues). Describí qué pasó, qué esperabas que pasara y tu entorno (sistema operativo, versión de Node.js, versión de Claude Code).
+
+**Enviar un pull request**
+1. Hacé un fork del repositorio y creá una rama: `git checkout -b fix/nombre-del-fix`
+2. Mantenés el PR enfocado en un solo cambio — pequeño y fácil de revisar
+3. Abrís un pull request con una descripción clara de qué cambiaste y por qué
+
+Para cambios grandes, abrí primero un issue para discutir el enfoque antes de escribir código.
+
+---
+
+## Licencia
 
 MIT License — Copyright Luis Recalde 2026
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the following conditions: the above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia de este software para usarlo, copiarlo, modificarlo, fusionarlo, publicarlo, distribuirlo, sublicenciarlo y/o venderlo, sujeto a que el aviso de copyright anterior y este aviso de permiso se incluyan en todas las copias o partes sustanciales del software.
