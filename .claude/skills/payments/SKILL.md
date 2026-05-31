@@ -789,3 +789,717 @@ Confirmar antes del build:
   </div>
 </section>
 ```
+
+---
+
+## Seguridad en Pagos — Obligatorio antes del deploy
+
+Esta sección debe ejecutarse como checklist de seguridad antes de activar pagos en producción. El agente NO debe permitir el deploy de pagos si algún punto del checklist final falla.
+
+### 1. Variables de entorno — Nunca hardcodear keys
+
+**Regla absoluta:** ninguna key de pago va en el código fuente. Todo va en `.env.local` (desarrollo) y en las variables de entorno de Vercel (producción).
+
+**Estructura de variables por procesador:**
+
+```bash
+# .env.local — NUNCA commitear este archivo
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...   # pública: puede ir en cliente
+STRIPE_SECRET_KEY=sk_live_...                     # secreta: solo servidor
+STRIPE_WEBHOOK_SECRET=whsec_...                   # secreta: solo servidor
+
+# Mercado Pago
+NEXT_PUBLIC_MP_PUBLIC_KEY=APP_USR-...             # pública: puede ir en cliente
+MP_ACCESS_TOKEN=APP_USR-...                       # secreta: solo servidor
+MP_WEBHOOK_SECRET=tu_clave_secreta                # secreta: solo servidor
+
+# PayPal
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=AX...               # pública: puede ir en cliente
+PAYPAL_CLIENT_ID=AX...                           # también necesaria en servidor
+PAYPAL_SECRET=EG...                              # secreta: solo servidor
+
+# Lemon Squeezy
+LEMON_SQUEEZY_API_KEY=eyJ...                     # secreta: solo servidor
+LEMON_SQUEEZY_STORE_ID=12345                     # puede ser pública
+LEMON_SQUEEZY_WEBHOOK_SECRET=tu_clave_secreta    # secreta: solo servidor
+```
+
+**Verificación rápida — detectar keys expuestas en el cliente:**
+```bash
+# Buscar variables sin NEXT_PUBLIC_ en Client Components
+grep -rn "process\.env\." --include="*.tsx" . \
+  | grep -v "NEXT_PUBLIC" \
+  | grep -v node_modules \
+  | grep -v "use server"
+```
+
+Si hay resultados en archivos `'use client'` → error de seguridad crítico.
+
+**Cómo acceder en cada contexto:**
+```tsx
+// Server Component o API Route — acceso a variables secretas
+const secretKey = process.env.STRIPE_SECRET_KEY!  // solo servidor
+
+// Client Component — solo variables NEXT_PUBLIC_
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+```
+
+---
+
+### 2. Validación de webhooks
+
+Los webhooks son requests HTTP que los procesadores envían cuando ocurre un evento de pago. Sin validación, cualquiera podría enviar un webhook falso y activar acceso a productos sin pagar.
+
+#### Stripe — `stripe.webhooks.constructEvent()`
+
+```ts
+// app/api/stripe-webhook/route.ts
+import Stripe from 'stripe'
+import { headers } from 'next/headers'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+export async function POST(req: Request) {
+  const body = await req.text()  // texto crudo — NO parsear a JSON antes
+  const headersList = await headers()
+  const sig = headersList.get('stripe-signature')
+
+  if (!sig) {
+    return new Response('Missing stripe-signature header', { status: 400 })
+  }
+
+  let event: Stripe.Event
+  try {
+    event = stripe.webhooks.constructEvent(
+      body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    )
+  } catch (err) {
+    console.error('Webhook signature verification failed:', (err as Error).message)
+    return new Response('Invalid signature', { status: 400 })
+  }
+
+  // Procesar solo eventos conocidos
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const intent = event.data.object as Stripe.PaymentIntent
+      await activateAccess(intent.metadata.userId, intent.metadata.productId)
+      break
+    case 'customer.subscription.deleted':
+      await revokeAccess(event.data.object as Stripe.Subscription)
+      break
+    default:
+      // Ignorar eventos no manejados
+  }
+
+  return new Response('OK', { status: 200 })
+}
+```
+
+#### Mercado Pago — HMAC-SHA256
+
+```ts
+// app/api/mp-webhook/route.ts
+import { createHmac } from 'crypto'
+import { headers } from 'next/headers'
+
+export async function POST(req: Request) {
+  const headersList = await headers()
+  const xSignature = headersList.get('x-signature')
+  const xRequestId = headersList.get('x-request-id')
+  const body = await req.text()
+
+  if (!xSignature || !xRequestId) {
+    return new Response('Missing headers', { status: 400 })
+  }
+
+  // Parsear ts y v1 del header x-signature
+  const parts = Object.fromEntries(
+    xSignature.split(',').map(part => {
+      const [key, value] = part.split('=')
+      return [key.trim(), value.trim()]
+    })
+  )
+
+  // Construir el mensaje a firmar
+  const url = new URL(req.url)
+  const dataId = url.searchParams.get('data.id') ?? ''
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${parts.ts};`
+
+  // Verificar la firma con HMAC-SHA256
+  const expected = createHmac('sha256', process.env.MP_WEBHOOK_SECRET!)
+    .update(manifest)
+    .digest('hex')
+
+  if (expected !== parts.v1) {
+    return new Response('Invalid signature', { status: 400 })
+  }
+
+  const notification = JSON.parse(body)
+  if (notification.type === 'payment') {
+    // Consultar el estado real del pago con la API de MP
+    const paymentRes = await fetch(
+      `https://api.mercadopago.com/v1/payments/${notification.data.id}`,
+      { headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` } }
+    )
+    const payment = await paymentRes.json()
+    if (payment.status === 'approved') {
+      await activateAccess(payment.external_reference)
+    }
+  }
+
+  return new Response('OK', { status: 200 })
+}
+```
+
+#### PayPal — `PayPal-Transmission-Sig`
+
+```ts
+// app/api/paypal-webhook/route.ts
+import { headers } from 'next/headers'
+
+export async function POST(req: Request) {
+  const headersList = await headers()
+  const body = await req.text()
+
+  // Verificar con la API de PayPal (delega la verificación a PayPal)
+  const auth = Buffer.from(
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
+  ).toString('base64')
+
+  const tokenRes = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
+    method: 'POST',
+    headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials',
+  })
+  const { access_token } = await tokenRes.json()
+
+  const verifyRes = await fetch('https://api-m.paypal.com/v1/notifications/verify-webhook-signature', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      auth_algo: headersList.get('paypal-auth-algo'),
+      cert_url: headersList.get('paypal-cert-url'),
+      transmission_id: headersList.get('paypal-transmission-id'),
+      transmission_sig: headersList.get('paypal-transmission-sig'),
+      transmission_time: headersList.get('paypal-transmission-time'),
+      webhook_id: process.env.PAYPAL_WEBHOOK_ID,
+      webhook_event: JSON.parse(body),
+    }),
+  })
+  const { verification_status } = await verifyRes.json()
+
+  if (verification_status !== 'SUCCESS') {
+    return new Response('Invalid signature', { status: 400 })
+  }
+
+  const event = JSON.parse(body)
+  if (event.event_type === 'PAYMENT.CAPTURE.COMPLETED') {
+    await activateAccess(event.resource.custom_id)
+  }
+
+  return new Response('OK', { status: 200 })
+}
+```
+
+---
+
+### 3. Idempotency keys — prevenir cobros duplicados
+
+Un usuario que hace clic dos veces en "Pagar" o una red inestable puede disparar dos requests. Sin idempotency, se cobra dos veces.
+
+#### Stripe — idempotencyKey en la creación de PaymentIntent
+
+```ts
+// app/api/stripe-checkout/route.ts
+import { randomUUID } from 'crypto'
+
+export async function POST(req: Request) {
+  const { priceId, userId } = await req.json()
+
+  // La key combina userId + priceId para que la misma compra nunca cree dos intents
+  const idempotencyKey = `${userId}-${priceId}-${new Date().toISOString().slice(0, 10)}`
+
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: 'payment',
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/gracias`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/#precios`,
+    },
+    { idempotencyKey }
+  )
+
+  return Response.json({ url: session.url })
+}
+```
+
+#### Mercado Pago — X-Idempotency-Key en preferencias
+
+```ts
+// app/api/mp-checkout/route.ts
+export async function POST(req: Request) {
+  const { title, price, externalRef } = await req.json()
+
+  // externalRef es el ID único de la compra en tu sistema
+  const idempotencyKey = `mp-${externalRef}`
+
+  const res = await fetch('https://api.mercadopago.com/checkout/preferences', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+      'X-Idempotency-Key': idempotencyKey,
+    },
+    body: JSON.stringify({
+      items: [{ title, unit_price: price, quantity: 1 }],
+      external_reference: externalRef,
+      back_urls: {
+        success: `${process.env.NEXT_PUBLIC_SITE_URL}/gracias`,
+        failure: `${process.env.NEXT_PUBLIC_SITE_URL}/error-pago`,
+      },
+    }),
+  })
+
+  const preference = await res.json()
+  return Response.json({ checkoutUrl: preference.init_point })
+}
+```
+
+---
+
+### 4. Sanitización de montos — calcular siempre en el servidor
+
+**Nunca confiar en el monto enviado desde el frontend.** Un usuario puede modificar cualquier valor antes de enviarlo.
+
+```ts
+// app/api/stripe-checkout/route.ts — INSEGURO (no hacer esto)
+export async function POST(req: Request) {
+  const { priceId, amount } = await req.json()
+  // MAL: usar el amount que mandó el cliente
+  const session = await stripe.checkout.sessions.create({
+    line_items: [{ price_data: { unit_amount: amount }, quantity: 1 }],
+  })
+}
+
+// app/api/stripe-checkout/route.ts — SEGURO
+const PRICE_CATALOG: Record<string, number> = {
+  'plan-basico':  500,   // en centavos: $5.00 USD
+  'plan-pro':    1500,   // $15.00 USD
+  'plan-anual': 14900,   // $149.00 USD
+}
+
+export async function POST(req: Request) {
+  const { planId } = await req.json()
+
+  // El monto viene del servidor — el cliente solo manda el ID del plan
+  const unitAmount = PRICE_CATALOG[planId]
+  if (!unitAmount) {
+    return new Response('Invalid plan', { status: 400 })
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    line_items: [{ price_data: { currency: 'usd', unit_amount: unitAmount, product_data: { name: planId } }, quantity: 1 }],
+    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/gracias`,
+    cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/#precios`,
+  })
+
+  return Response.json({ url: session.url })
+}
+```
+
+Lo mismo aplica para Mercado Pago: el `unit_price` siempre viene de un catálogo en el servidor, no del request del cliente.
+
+---
+
+### 5. Rate limiting en API routes de pago
+
+Sin rate limiting, un bot puede intentar miles de transacciones por segundo, generando cargos en las APIs de pago o agotando cuotas.
+
+```bash
+npm install @upstash/ratelimit @upstash/redis
+```
+
+```ts
+// lib/ratelimit.ts
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
+
+export const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, '60s'),  // 5 requests por minuto por IP
+  analytics: true,
+})
+```
+
+```ts
+// app/api/stripe-checkout/route.ts
+import { ratelimit } from '@/lib/ratelimit'
+import { headers } from 'next/headers'
+
+export async function POST(req: Request) {
+  const headersList = await headers()
+  const ip = headersList.get('x-forwarded-for') ?? '127.0.0.1'
+
+  const { success, limit, remaining } = await ratelimit.limit(ip)
+  if (!success) {
+    return new Response('Demasiadas solicitudes. Esperá un momento e intentá de nuevo.', {
+      status: 429,
+      headers: { 'X-RateLimit-Limit': String(limit), 'X-RateLimit-Remaining': String(remaining) },
+    })
+  }
+
+  // ... resto de la lógica de checkout
+}
+```
+
+**Alternativa sin Upstash** (para proyectos sin Redis):
+```ts
+// Rate limiting en memoria — se reinicia con cada deploy, solo para desarrollo
+const requestCounts = new Map<string, { count: number; resetAt: number }>()
+
+function checkRateLimit(ip: string, limit = 5, windowMs = 60_000): boolean {
+  const now = Date.now()
+  const entry = requestCounts.get(ip)
+
+  if (!entry || now > entry.resetAt) {
+    requestCounts.set(ip, { count: 1, resetAt: now + windowMs })
+    return true
+  }
+
+  if (entry.count >= limit) return false
+  entry.count++
+  return true
+}
+```
+
+---
+
+### 6. Replay attack prevention — validar timestamp en webhooks
+
+Un replay attack reenvía un webhook legítimo capturado anteriormente para activar acceso sin pagar. La defensa es rechazar webhooks con timestamp viejo.
+
+**Stripe** lo maneja automáticamente: `constructEvent` rechaza eventos con más de 5 minutos de diferencia con el timestamp del header (configurable con el tercer parámetro `tolerance`).
+
+```ts
+// Stripe — tolerance por defecto es 300 segundos (5 minutos)
+// Para ser más estricto:
+stripe.webhooks.constructEvent(body, sig, secret, 180)  // 3 minutos máximo
+```
+
+**Mercado Pago — verificar `ts` del header x-signature:**
+```ts
+const MAX_AGE_MS = 5 * 60 * 1000  // 5 minutos
+
+const timestamp = parseInt(parts.ts, 10) * 1000  // MP usa segundos
+if (Date.now() - timestamp > MAX_AGE_MS) {
+  return new Response('Webhook expired', { status: 400 })
+}
+```
+
+**PayPal — verificar `paypal-transmission-time`:**
+```ts
+const headersList = await headers()
+const transmissionTime = headersList.get('paypal-transmission-time')
+if (transmissionTime) {
+  const eventTime = new Date(transmissionTime).getTime()
+  if (Date.now() - eventTime > 5 * 60 * 1000) {
+    return new Response('Webhook expired', { status: 400 })
+  }
+}
+```
+
+---
+
+### 7. Portal del cliente — suscripciones y reembolsos
+
+#### Stripe — Customer Portal
+
+```ts
+// app/api/stripe-portal/route.ts
+import Stripe from 'stripe'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+export async function POST(req: Request) {
+  const { customerId } = await req.json()
+
+  // customerId debe venir de la sesión del usuario autenticado — nunca del body sin verificar
+  const session = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cuenta`,
+  })
+
+  return Response.json({ url: session.url })
+}
+```
+
+Configurar el portal en el Dashboard de Stripe → Settings → Customer Portal: habilitar cancelación, descarga de facturas y actualización de método de pago.
+
+#### Mercado Pago — reembolsos
+
+```ts
+// app/api/mp-refund/route.ts
+export async function POST(req: Request) {
+  const { paymentId } = await req.json()
+  // Verificar que el paymentId pertenece al usuario autenticado antes de proceder
+
+  const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}/refunds`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+      'X-Idempotency-Key': `refund-${paymentId}`,
+    },
+  })
+
+  const refund = await res.json()
+  return Response.json({ status: refund.status })
+}
+```
+
+---
+
+### 8. Manejo de errores — mostrar al usuario, no exponer internals
+
+**Regla:** el usuario ve un mensaje claro. Los logs del servidor capturan el detalle técnico. Nunca mostrar stack traces, IDs internos de pago, o mensajes de error de la API al cliente.
+
+```tsx
+// components/PaymentError.tsx
+'use client'
+
+interface PaymentErrorProps {
+  type: 'card_declined' | 'insufficient_funds' | 'expired_card' | 'generic'
+  supportEmail?: string
+}
+
+const ERROR_MESSAGES: Record<PaymentErrorProps['type'], string> = {
+  card_declined:       'Tu tarjeta fue rechazada. Verificá los datos o intentá con otra tarjeta.',
+  insufficient_funds:  'Fondos insuficientes. Verificá el saldo de tu tarjeta.',
+  expired_card:        'Tu tarjeta está vencida. Usá una tarjeta vigente.',
+  generic:             'Hubo un problema con el pago. Intentá de nuevo en unos minutos.',
+}
+
+export function PaymentError({ type, supportEmail }: PaymentErrorProps) {
+  return (
+    <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded text-sm">
+      <p className="font-medium text-red-800">{ERROR_MESSAGES[type]}</p>
+      {supportEmail && (
+        <p className="text-red-600 mt-1">
+          Si el problema persiste, contactanos en{' '}
+          <a href={`mailto:${supportEmail}`} className="underline">{supportEmail}</a>
+        </p>
+      )}
+    </div>
+  )
+}
+```
+
+**En la API route — loggear sin exponer:**
+```ts
+export async function POST(req: Request) {
+  try {
+    // ... lógica de pago
+  } catch (err) {
+    // Loggear el error completo en el servidor (Vercel logs, Sentry, etc.)
+    console.error('[payment-error]', {
+      message: (err as Error).message,
+      stack: (err as Error).stack,
+      timestamp: new Date().toISOString(),
+    })
+
+    // Responder al cliente con un mensaje genérico — sin detalles internos
+    return Response.json(
+      { error: 'payment_failed', type: 'generic' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+---
+
+### 9. Testing de pagos — modo sandbox antes de producción
+
+**Regla:** nunca activar credenciales de producción sin haber probado el flujo completo en sandbox.
+
+#### Stripe — tarjetas de prueba
+
+```
+# Pago exitoso
+Número: 4242 4242 4242 4242
+Fecha:  cualquier fecha futura
+CVC:    cualquier 3 dígitos
+
+# Tarjeta rechazada
+Número: 4000 0000 0000 0002
+
+# Fondos insuficientes
+Número: 4000 0000 0000 9995
+
+# Requiere autenticación 3D Secure
+Número: 4000 0025 0000 3155
+```
+
+Keys de test: `pk_test_...` y `sk_test_...` — el dashboard de Stripe las muestra en modo "Test".
+
+#### Mercado Pago — usuarios de prueba
+
+```bash
+# Crear usuarios de prueba vía API
+curl -X POST \
+  "https://api.mercadopago.com/users/test" \
+  -H "Authorization: Bearer TEST-..." \
+  -H "Content-Type: application/json" \
+  -d '{"site_id": "MLA"}'  # MLA=Argentina, MLM=México, MLC=Chile, MCO=Colombia, MPY=Paraguay
+```
+
+Tarjetas de prueba por país disponibles en: https://www.mercadopago.com.ar/developers/es/docs/checkout-api/integration-test/test-cards
+
+#### PayPal — cuentas Sandbox
+
+1. Ir a https://developer.paypal.com/tools/sandbox/accounts
+2. PayPal crea automáticamente una cuenta de comprador y una de vendedor de prueba
+3. Usar el Client ID del modo Sandbox (empieza diferente al de producción)
+4. Probar con las credenciales de la cuenta de comprador de sandbox
+
+**Verificar en sandbox antes de producción:**
+- [ ] Flujo de pago completo (selección → checkout → confirmación)
+- [ ] Webhook recibido y procesado correctamente
+- [ ] Acceso al producto activado después del pago
+- [ ] Flujo de reembolso
+- [ ] Manejo de error por tarjeta rechazada
+
+---
+
+### 10. Compliance LATAM — consideraciones legales básicas
+
+#### Paraguay
+- **IVA:** 10% general, 5% para productos de primera necesidad y medicamentos
+- **Facturación:** no existe facturación electrónica obligatoria generalizada (2025), pero se recomienda emitir comprobante de pago
+- **DNIT** (Dirección Nacional de Ingresos Tributarios): registrarse si el volumen mensual supera el mínimo imponible
+- **Términos de servicio mínimos:** nombre del proveedor, descripción del servicio, precio con IVA incluido, política de cancelación/reembolso
+
+#### Argentina
+- **IVA:** 21% general, 10.5% para algunos servicios digitales
+- **AFIP:** los servicios digitales de proveedores del exterior están gravados; para negocios locales, facturar con IVA incluido
+- **Factura electrónica:** obligatoria para monotributistas y responsables inscriptos — usar servicios como Facturade, Alegra o Tango
+- **Impuesto PAIS y percepciones:** los pagos con tarjeta en USD tienen cargas adicionales
+
+#### México
+- **IVA:** 16% general
+- **SAT:** facturación electrónica (CFDI) obligatoria para personas morales y personas físicas con actividad empresarial
+- **Marketplace:** si vendés en México, Mercado Pago México retiene y reporta IVA automáticamente en muchos casos
+- **CLABE:** los pagos locales requieren CLABE interbancaria; Mercado Pago la maneja
+
+#### Ecuador
+- **IVA:** 15% (desde 2024)
+- **SRI:** el Servicio de Rentas Internas requiere facturación electrónica para actividades comerciales
+- **Sector digital:** los servicios digitales de no residentes están sujetos a retención
+
+**Para todos los mercados — mínimos en los términos de servicio:**
+1. Nombre o razón social del vendedor
+2. RUC/CUIT/RFC/NIT según el país
+3. Precio con impuestos incluidos claramente indicado
+4. Política de cancelación y reembolso (plazo, condiciones)
+5. Descripción clara del producto o servicio
+6. Canales de contacto y tiempo de respuesta
+
+---
+
+### 11. Monitoreo post-deploy
+
+#### Alertas cuando falla un webhook
+
+**Stripe — configurar alerta en el Dashboard:**
+- Stripe → Developers → Webhooks → seleccionar el endpoint → "Alerts" → activar alerta por email cuando el endpoint falla 3 veces consecutivas
+
+**Mercado Pago:**
+- El reintento de webhooks fallidos es automático (MP reintenta hasta 24 horas)
+- Loggear cada webhook recibido con su ID para detectar duplicados:
+```ts
+// En la API route del webhook
+console.log('[mp-webhook]', { id: notification.data.id, type: notification.type, ts: Date.now() })
+```
+
+**PayPal:**
+- PayPal → Developer Dashboard → My Apps → seleccionar app → Webhooks → ver el historial de eventos y reenviar manualmente si es necesario
+
+#### Detectar cobros duplicados en producción
+
+```ts
+// Guardar cada payment ID procesado en una store (base de datos o KV)
+// Ejemplo con Vercel KV (Redis)
+import { kv } from '@vercel/kv'
+
+async function isAlreadyProcessed(paymentId: string): Promise<boolean> {
+  const exists = await kv.exists(`processed:${paymentId}`)
+  return exists === 1
+}
+
+async function markAsProcessed(paymentId: string): Promise<void> {
+  // Guardar por 30 días
+  await kv.set(`processed:${paymentId}`, '1', { ex: 30 * 24 * 60 * 60 })
+}
+
+// En el webhook handler
+if (await isAlreadyProcessed(paymentId)) {
+  console.warn('[webhook-duplicate]', paymentId)
+  return new Response('Already processed', { status: 200 })  // 200 para no disparar reintento
+}
+await markAsProcessed(paymentId)
+// ... procesar
+```
+
+#### Herramientas de monitoreo recomendadas
+
+| Procesador | Herramienta | Qué monitorear |
+|---|---|---|
+| Stripe | Stripe Radar + Dashboard | Pagos rechazados, chargebacks, webhooks fallidos |
+| Mercado Pago | Dashboard MP + logs de Vercel | Pagos pendientes, rechazados, webhooks no procesados |
+| PayPal | PayPal Resolution Center | Disputas, chargebacks, pagos retenidos |
+| Todos | Vercel Logs | Errores en API routes, rate limiting activado |
+| Todos | Sentry (opcional) | Excepciones en webhooks y checkout |
+
+---
+
+### 12. Checklist pre-deploy de pagos — 15 puntos
+
+El agente debe verificar cada punto. Si alguno falla, NO proceder con el deploy de pagos hasta corregirlo.
+
+```
+VARIABLES DE ENTORNO
+- [ ] 1. Ninguna API key hardcodeada en el código fuente
+- [ ] 2. .env.local está en .gitignore y no fue commiteado
+- [ ] 3. Variables de producción configuradas en Vercel (no solo en .env.local)
+- [ ] 4. Keys secretas (STRIPE_SECRET_KEY, MP_ACCESS_TOKEN, PAYPAL_SECRET)
+         solo en variables sin NEXT_PUBLIC_
+
+WEBHOOKS
+- [ ] 5. Webhook endpoint registrado en el dashboard del procesador
+- [ ] 6. Firma del webhook verificada antes de procesar cualquier evento
+- [ ] 7. Timestamp verificado — rechazar webhooks con más de 5 minutos de antigüedad
+- [ ] 8. Idempotency implementada — no procesar el mismo pago dos veces
+
+MONTOS Y SEGURIDAD
+- [ ] 9. Monto calculado en el servidor — no en el cliente
+- [ ] 10. Rate limiting activo en todas las API routes de pago
+- [ ] 11. Inputs sanitizados — validar tipo y rango antes de pasarlos a la API de pago
+
+TESTING
+- [ ] 12. Flujo completo probado en modo sandbox/test antes de activar producción
+- [ ] 13. Webhook de sandbox procesado correctamente al menos una vez
+- [ ] 14. Manejo de error por tarjeta rechazada probado y el usuario ve mensaje claro
+
+COMPLIANCE
+- [ ] 15. Términos de servicio incluyen: nombre del vendedor, precio con impuestos,
+          política de reembolso, y canal de contacto
+
+---
+Si todos los 15 puntos pasan → activar credenciales de producción y hacer deploy.
+Si alguno falla → corregir antes de proceder. Reportar al usuario qué falta.
+```
