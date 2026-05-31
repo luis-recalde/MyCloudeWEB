@@ -55,6 +55,7 @@ Presentá cada ronda por separado. Esperá las respuestas completas antes de pas
 4. ¿Hay alguna funcionalidad especial que necesitás? (ej: formulario de contacto, sistema de reservas, tienda online, chat en vivo) — Si no sabés si es posible, igual mencionalo.
 5. ¿Querés que los visitantes puedan agendar una llamada o cita directamente desde tu sitio? (sí / no — si sí, ¿tenés cuenta en Cal.com o queremos crearla?)
 6. ¿Qué redes sociales querés mostrar en el sitio? Compartí los links de cada una que uses activamente. (ej: Instagram, TikTok, LinkedIn, Facebook, YouTube, WhatsApp, X/Twitter — solo las que usás)
+7. ¿Querés vender algo desde tu sitio? (productos digitales, servicios, cursos) — si sí, ¿qué método de pago preferís? (Mercado Pago, Stripe, Lemon Squeezy, u otro)
 
 ---
 
