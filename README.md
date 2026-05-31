@@ -12,7 +12,7 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 
 ## Qué obtenés
 
-- Un sitio web completo en **Next.js 14** con tu contenido real y tu identidad visual
+- Un sitio web completo en **Next.js 15** con tu contenido real y tu identidad visual
 - Sistema de diseño en **Tailwind CSS** adaptado a tu industria y estilo
 - **Diseño responsivo** para móvil desde el primer momento
 - **Metadatos SEO** configurados con la información de tu negocio
@@ -84,7 +84,7 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 Solo necesitás dos cosas instaladas:
 
 - [Node.js 18+](https://nodejs.org) — el entorno de ejecución de JavaScript
-- [Claude Code](https://claude.ai/code) — el asistente de código con IA
+- [Claude Code](https://claude.ai/download) — el asistente de código con IA
 
 No se requiere experiencia en desarrollo web.
 

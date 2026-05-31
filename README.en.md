@@ -51,7 +51,7 @@ Answer a few questions about your business. The AI writes the code, designs the 
 You only need two things installed:
 
 - [Node.js 18+](https://nodejs.org) — the JavaScript runtime
-- [Claude Code](https://claude.ai/code) — the AI coding assistant
+- [Claude Code](https://claude.ai/download) — the AI coding assistant
 
 No web development experience needed.
 
