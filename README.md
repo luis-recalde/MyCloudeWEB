@@ -20,6 +20,21 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 
 ---
 
+## Por qué MyCloudeWEB
+
+| | MyCloudeWEB |
+|---|---|
+| **Skills especializadas** | 22 — más que cualquier template similar |
+| **Idiomas** | Bilingüe EN / ES — detección automática |
+| **Pagos** | Mercado Pago · Stripe · PayPal · Lemon Squeezy |
+| **Agendamiento** | Cal.com · Google Calendar · Google Meet |
+| **Redes sociales** | Instagram · TikTok · LinkedIn · Facebook · YouTube · WhatsApp · X |
+| **Skills exclusivas para LATAM** | 6 — copy en español, WhatsApp CTA, confianza, showcase de IA |
+| **Deploy** | Gratis en Vercel — guía incluida |
+| **Licencia** | MIT — el código es 100% tuyo |
+
+---
+
 ## Demo
 
 ### El proceso
@@ -34,21 +49,33 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 
 ### El resultado — RS Games Club, construido con MyCloudeWEB
 
-![RS Games Club — sección hero](docs/screenshots/hero-rsgames.png)
+![RS Games Club — Hero con identidad visual personalizada](docs/screenshots/hero-rsgames.png)
 
 *Hero con identidad visual, paleta de colores y CTA personalizados para el negocio.*
 
-![RS Games Club — sección nosotros](docs/screenshots/nosotros-rsgames.png)
+![RS Games Club — Sección sobre el negocio sin Lorem ipsum](docs/screenshots/nosotros-rsgames.png)
 
 *Sección sobre el negocio generada a partir de las respuestas del cuestionario — sin Lorem ipsum.*
 
-![RS Games Club — sección servicios](docs/screenshots/servicios-rsgames.png)
+![RS Games Club — Servicios con contenido real](docs/screenshots/servicios-rsgames.png)
 
 *Sección de servicios con contenido real y layout elegido para la industria.*
 
-![RS Games Club — sección contacto](docs/screenshots/contacto-rsgames.png)
+![RS Games Club — Integración de calendario para torneos](docs/screenshots/reserva-rsgames.png)
 
-*Sección de contacto con todos los canales provistos por el cliente, incluyendo WhatsApp.*
+*Agendamiento integrado con Cal.com — los visitantes reservan turno sin salir del sitio.*
+
+![RS Games Club — Pagos con Mercado Pago y PayPal integrados](docs/screenshots/pagos-rsgames.png)
+
+*Pagos online con Mercado Pago y PayPal configurados directamente desde el cuestionario.*
+
+![RS Games Club — Contacto con WhatsApp y formulario](docs/screenshots/contacto-rsgames.png)
+
+*Sección de contacto con WhatsApp, formulario y todos los canales del cliente.*
+
+![RS Games Club — Footer con redes sociales](docs/screenshots/contracto.png)
+
+*Footer con redes sociales, links de navegación y datos legales del negocio.*
 
 ---
 
