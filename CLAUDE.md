@@ -214,7 +214,7 @@ If the build fails, fix all errors silently and re-run. Do not report errors to 
 
 ## PHASE 5 — Preview & Visual QA
 
-**Goal:** Verify the site is correct before deploying.
+**Goal:** Verify the site is correct and secure before deploying.
 
 1. Run `npm run dev` inside the project folder.
 2. Tell the user: *"Your site is running at http://localhost:3000 — open that in your browser."*
@@ -229,7 +229,8 @@ If the build fails, fix all errors silently and re-run. Do not report errors to 
    - [ ] No TypeScript errors
 
 4. Fix any issues found before reporting back.
-5. Tell the user what you verified and ask: *"Does everything look correct? Ready to deploy? / ¿Todo se ve bien? ¿Listo para el deploy?"*
+5. **Run the `security-audit` skill** — mandatory before every deploy. Check: security headers in `next.config.js`, hardcoded secrets (60+ patterns), `.gitignore` coverage, `npm audit` results, external links HTTPS + `rel="noopener noreferrer"`, and no sensitive data in the client bundle. Fix any critical findings before proceeding.
+6. Tell the user what you verified and ask: *"Does everything look correct? Ready to deploy? / ¿Todo se ve bien? ¿Listo para el deploy?"*
 
 ---
 
@@ -296,6 +297,7 @@ Las siguientes skills están en `.claude/skills/`. Activarlas cuando el contexto
 | `trust-builder` | Elementos de confianza para LATAM: testimonios, garantías, credenciales, sobre mí | El sitio no genera consultas o el servicio requiere alta confianza antes de contratar |
 | `performance-audit` | Checklist de velocidad: imágenes, fuentes, scripts, JS, Core Web Vitals, bundle size | El sitio está lento, Lighthouse < 80 en Performance, o se hace QA final pre-deploy |
 | `accessibility-check` | Contraste, semántica HTML, navegación por teclado, ARIA, formularios, lectores de pantalla | Se construye o revisa cualquier componente interactivo, o Lighthouse Accessibility < 90 |
+| `security-audit` | Headers HTTP, secrets hardcodeados (60+ patrones), .gitignore, npm audit, HTTPS links, OWASP Top 10 | **Automático en Fase 5** — obligatorio antes de todo deploy |
 
 ---
 
