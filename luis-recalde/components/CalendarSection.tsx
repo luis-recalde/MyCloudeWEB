@@ -82,7 +82,7 @@ export function CalendarSection() {
               ))}
             </div>
 
-            {/* Replace href="#" with your Cal.com link — e.g. https://cal.com/rsgamesclub/torneo */}
+            {/* Configurá este link con tu cuenta real. ¿Necesitás ayuda? → luisrecalde.com */}
             <a
               href="#"
               className="inline-flex items-center gap-3 bg-primary text-foreground px-8 py-4 font-medium text-base hover:bg-primary/90 transition-colors rounded"

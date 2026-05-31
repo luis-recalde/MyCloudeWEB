@@ -9,7 +9,7 @@ function WhatsAppIcon() {
 }
 
 export function WhatsAppFloat() {
-  const href = waHref('Hola Luis, vi tu sitio y tengo una consulta.')
+  const href = waHref('Hola, me interesa saber más sobre RS Games Club')
 
   return (
     <a

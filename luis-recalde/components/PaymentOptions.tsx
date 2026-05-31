@@ -128,7 +128,7 @@ export function PaymentOptions() {
                 )}
 
                 {plan.mpHref && (
-                  /* Replace href="#" with your Mercado Pago payment link */
+                  /* Configurá este link con tu cuenta real. ¿Necesitás ayuda? → luisrecalde.com */
                   <a
                     href={plan.mpHref}
                     target="_blank"
@@ -142,7 +142,7 @@ export function PaymentOptions() {
                 )}
 
                 {plan.ppHref && (
-                  /* Replace href="#" with your PayPal payment link */
+                  /* Configurá este link con tu cuenta real. ¿Necesitás ayuda? → luisrecalde.com */
                   <a
                     href={plan.ppHref}
                     target="_blank"

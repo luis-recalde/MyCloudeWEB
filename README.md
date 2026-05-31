@@ -33,6 +33,8 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 | **Deploy** | Gratis en Vercel — guía incluida |
 | **Licencia** | MIT — el código es 100% tuyo |
 
+> **¿Necesitás ayuda para configurar pagos, Cal.com o tu dominio?** → [luisrecalde.com](https://luisrecalde.com)
+
 ---
 
 ## Demo
@@ -68,10 +70,6 @@ Respondés algunas preguntas sobre tu negocio. La IA escribe el código, diseña
 ![RS Games Club — Pagos con Mercado Pago y PayPal integrados](docs/screenshots/pagos-rsgames.png)
 
 *Pagos online con Mercado Pago y PayPal configurados directamente desde el cuestionario.*
-
-![RS Games Club — Contacto con WhatsApp y formulario](docs/screenshots/contacto-rsgames.png)
-
-*Sección de contacto con WhatsApp, formulario y todos los canales del cliente.*
 
 ![RS Games Club — Footer con redes sociales](docs/screenshots/contracto.png)
 
@@ -193,6 +191,9 @@ Sí. El código generado es Next.js + Tailwind estándar. Cualquier desarrollado
 
 **¿Qué pasa si quiero cambios después de que el sitio esté construido?**
 Abrí Claude Code en la carpeta del proyecto generado y describí los cambios que querés en lenguaje natural.
+
+**¿Cómo configuro Cal.com, Mercado Pago o mis redes sociales?**
+El template incluye los componentes listos. Para configurarlos con tus cuentas reales, podés hacerlo vos mismo siguiendo la documentación de cada plataforma, o contratar una sesión de ayuda en [luisrecalde.com](https://luisrecalde.com).
 
 ---
 
